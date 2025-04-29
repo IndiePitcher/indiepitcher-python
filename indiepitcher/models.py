@@ -3,6 +3,7 @@ from enum import Enum
 from typing import Any, Dict, Generic, List, Optional, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
+from pydantic.alias_generators import to_camel, to_snake
 
 T = TypeVar("T")
 M = TypeVar("M", bound=Dict[str, Any])
@@ -15,26 +16,34 @@ class EmailBodyFormat(str, Enum):
     HTML = "html"
 
 
-class BaseIndiePitcherModel(BaseModel):
-    """Base model with configuration for all IndiePitcher models."""
+class BaseIndiePitcherResponseModel(BaseModel):
+    """Base model with configuration for all IndiePitcher response models."""
 
     model_config = ConfigDict(
         populate_by_name=True,
-        alias_generator=lambda s: "".join(
-            [s[0].lower(), *[c if c.islower() else f"{c}" for c in s[1:]]]
-        ),
+        alias_generator=to_camel,
         arbitrary_types_allowed=True,
     )
 
 
-class Response(BaseIndiePitcherModel, Generic[T]):
+class BaseIndiePitcherRequestModel(BaseModel):
+    """Base model with configuration for all IndiePitcher response models."""
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        alias_generator=to_snake,
+        arbitrary_types_allowed=True,
+    )
+
+
+class Response(BaseIndiePitcherResponseModel, Generic[T]):
     """Generic response wrapper for API responses with data."""
 
     success: bool
     data: T
 
 
-class PaginationMetadata(BaseIndiePitcherModel):
+class PaginationMetadata(BaseIndiePitcherResponseModel):
     """Standard pagination metadata."""
 
     page: int
@@ -42,7 +51,7 @@ class PaginationMetadata(BaseIndiePitcherModel):
     total: int
 
 
-class PaginatedResponse(BaseIndiePitcherModel, Generic[T]):
+class PaginatedResponse(BaseIndiePitcherResponseModel, Generic[T]):
     """Generic response wrapper for paginated API responses."""
 
     success: bool
@@ -50,7 +59,7 @@ class PaginatedResponse(BaseIndiePitcherModel, Generic[T]):
     metadata: PaginationMetadata
 
 
-class Contact(BaseIndiePitcherModel):
+class Contact(BaseIndiePitcherResponseModel):
     """Represents a contact in the IndiePitcher system."""
 
     email: str
@@ -63,7 +72,7 @@ class Contact(BaseIndiePitcherModel):
     custom_properties: Dict[str, Any] = Field(default_factory=dict)
 
 
-class CreateContact(BaseIndiePitcherModel):
+class CreateContact(BaseIndiePitcherRequestModel):
     """Data for creating a new contact."""
 
     email: str
@@ -77,7 +86,7 @@ class CreateContact(BaseIndiePitcherModel):
     custom_properties: Dict[str, Any] = Field(default_factory=dict)
 
 
-class UpdateContact(BaseIndiePitcherModel):
+class UpdateContact(BaseIndiePitcherRequestModel):
     """Data for updating an existing contact."""
 
     email: str
@@ -90,7 +99,7 @@ class UpdateContact(BaseIndiePitcherModel):
     custom_properties: Optional[Dict[str, Any]] = None
 
 
-class MailingList(BaseIndiePitcherModel):
+class MailingList(BaseIndiePitcherResponseModel):
     """Represents a mailing list in the IndiePitcher system."""
 
     name: str
@@ -98,14 +107,14 @@ class MailingList(BaseIndiePitcherModel):
     num_subscribers: int
 
 
-class CreateMailingListPortalSession(BaseIndiePitcherModel):
+class CreateMailingListPortalSession(BaseIndiePitcherRequestModel):
     """Data for creating a mailing list portal session."""
 
     contact_email: str
     return_url: str
 
 
-class MailingListPortalSession(BaseIndiePitcherModel):
+class MailingListPortalSession(BaseIndiePitcherResponseModel):
     """Response from creating a mailing list portal session."""
 
     url: str
@@ -113,7 +122,7 @@ class MailingListPortalSession(BaseIndiePitcherModel):
     return_url: str
 
 
-class SendEmail(BaseIndiePitcherModel):
+class SendEmail(BaseIndiePitcherRequestModel):
     """Data for sending a transactional email."""
 
     to: str
@@ -124,7 +133,7 @@ class SendEmail(BaseIndiePitcherModel):
     track_email_link_clicks: Optional[bool] = None
 
 
-class SendEmailToContact(BaseIndiePitcherModel):
+class SendEmailToContact(BaseIndiePitcherRequestModel):
     """Data for sending an email to a contact or contacts."""
 
     subject: str
@@ -139,7 +148,7 @@ class SendEmailToContact(BaseIndiePitcherModel):
     track_email_link_clicks: Optional[bool] = None
 
 
-class SendEmailToMailingList(BaseIndiePitcherModel):
+class SendEmailToMailingList(BaseIndiePitcherRequestModel):
     """Data for sending an email to a mailing list."""
 
     subject: str
