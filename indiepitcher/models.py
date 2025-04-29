@@ -1,36 +1,42 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, Generic, List, Optional, TypeVar, Union
+from typing import Any, Dict, Generic, List, Optional, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
-T = TypeVar('T')
-M = TypeVar('M', bound=Dict[str, Any])
+T = TypeVar("T")
+M = TypeVar("M", bound=Dict[str, Any])
 
 
 class EmailBodyFormat(str, Enum):
     """Format of the email body content."""
+
     MARKDOWN = "markdown"
     HTML = "html"
 
 
 class BaseIndiePitcherModel(BaseModel):
     """Base model with configuration for all IndiePitcher models."""
+
     model_config = ConfigDict(
         populate_by_name=True,
-        alias_generator=lambda s: ''.join([s[0].lower(), *[c if c.islower() else f'{c}' for c in s[1:]]]),
-        arbitrary_types_allowed=True
+        alias_generator=lambda s: "".join(
+            [s[0].lower(), *[c if c.islower() else f"{c}" for c in s[1:]]]
+        ),
+        arbitrary_types_allowed=True,
     )
 
 
 class Response(BaseIndiePitcherModel, Generic[T]):
     """Generic response wrapper for API responses with data."""
+
     success: bool
     data: T
 
 
 class PaginationMetadata(BaseIndiePitcherModel):
     """Standard pagination metadata."""
+
     page: int
     per: int
     total: int
@@ -38,6 +44,7 @@ class PaginationMetadata(BaseIndiePitcherModel):
 
 class PaginatedResponse(BaseIndiePitcherModel, Generic[T]):
     """Generic response wrapper for paginated API responses."""
+
     success: bool
     data: List[T]
     metadata: PaginationMetadata
@@ -45,6 +52,7 @@ class PaginatedResponse(BaseIndiePitcherModel, Generic[T]):
 
 class Contact(BaseIndiePitcherModel):
     """Represents a contact in the IndiePitcher system."""
+
     email: str
     user_id: Optional[str] = None
     name: Optional[str] = None
@@ -57,6 +65,7 @@ class Contact(BaseIndiePitcherModel):
 
 class CreateContact(BaseIndiePitcherModel):
     """Data for creating a new contact."""
+
     email: str
     user_id: Optional[str] = None
     avatar_url: Optional[str] = None
@@ -70,6 +79,7 @@ class CreateContact(BaseIndiePitcherModel):
 
 class UpdateContact(BaseIndiePitcherModel):
     """Data for updating an existing contact."""
+
     email: str
     user_id: Optional[str] = None
     avatar_url: Optional[str] = None
@@ -82,6 +92,7 @@ class UpdateContact(BaseIndiePitcherModel):
 
 class MailingList(BaseIndiePitcherModel):
     """Represents a mailing list in the IndiePitcher system."""
+
     name: str
     title: str
     num_subscribers: int
@@ -89,12 +100,14 @@ class MailingList(BaseIndiePitcherModel):
 
 class CreateMailingListPortalSession(BaseIndiePitcherModel):
     """Data for creating a mailing list portal session."""
+
     contact_email: str
     return_url: str
 
 
 class MailingListPortalSession(BaseIndiePitcherModel):
     """Response from creating a mailing list portal session."""
+
     url: str
     expires_at: datetime
     return_url: str
@@ -102,6 +115,7 @@ class MailingListPortalSession(BaseIndiePitcherModel):
 
 class SendEmail(BaseIndiePitcherModel):
     """Data for sending a transactional email."""
+
     to: str
     subject: str
     body: str
@@ -112,6 +126,7 @@ class SendEmail(BaseIndiePitcherModel):
 
 class SendEmailToContact(BaseIndiePitcherModel):
     """Data for sending an email to a contact or contacts."""
+
     subject: str
     body: str
     body_format: EmailBodyFormat
@@ -126,6 +141,7 @@ class SendEmailToContact(BaseIndiePitcherModel):
 
 class SendEmailToMailingList(BaseIndiePitcherModel):
     """Data for sending an email to a mailing list."""
+
     subject: str
     body: str
     body_format: EmailBodyFormat
@@ -142,5 +158,3 @@ EmptyResponse = Response[None]
 ContactsResponse = PaginatedResponse[Contact]
 MailingListsResponse = PaginatedResponse[MailingList]
 MailingListPortalSessionResponse = Response[MailingListPortalSession]
-
-

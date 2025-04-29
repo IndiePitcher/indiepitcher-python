@@ -20,7 +20,9 @@ from .models import (
 class IndiePitcherClient:
     """Client for interacting with the IndiePitcher API."""
 
-    def __init__(self, api_key: str, base_url: str = "https://api.indiepitcher.com/v1") -> None:
+    def __init__(
+        self, api_key: str, base_url: str = "https://api.indiepitcher.com/v1"
+    ) -> None:
         """
         Initialize the IndiePitcher API client.
 
@@ -54,7 +56,9 @@ class IndiePitcherClient:
         Raises:
             requests.HTTPError: If the request fails
         """
-        response = self.session.get(f"{self.base_url}/contacts/find", params={"email": email})
+        response = self.session.get(
+            f"{self.base_url}/contacts/find", params={"email": email}
+        )
         response.raise_for_status()
         return ContactResponse.model_validate_json(response.content)
 
@@ -117,7 +121,10 @@ class IndiePitcherClient:
 
         response = self.session.post(
             f"{self.base_url}/contacts/create_many",
-            json=[contact.model_dump(by_alias=True, exclude_none=True) for contact in contacts],
+            json=[
+                contact.model_dump(by_alias=True, exclude_none=True)
+                for contact in contacts
+            ],
         )
         response.raise_for_status()
         return ContactsResponse.model_validate_json(response.content)
@@ -155,19 +162,23 @@ class IndiePitcherClient:
         Raises:
             requests.HTTPError: If the request fails
         """
-        response = self.session.post(f"{self.base_url}/contacts/delete", json={"email": email})
+        response = self.session.post(
+            f"{self.base_url}/contacts/delete", json={"email": email}
+        )
         response.raise_for_status()
         return EmptyResponse.model_validate_json(response.content)
 
     # Mailing List Management
 
-    def list_mailing_lists(self, page: int = 1, per_page: int = 50) -> MailingListsResponse:
+    def list_mailing_lists(
+        self, page: int = 1, per_page: int = 10
+    ) -> MailingListsResponse:
         """
         Get all mailing lists.
 
         Args:
             page: Page number (default: 1)
-            per_page: Number of lists per page (default: 50)
+            per_page: Number of lists per page (default: 10)
 
         Returns:
             MailingListsResponse: Paginated list of mailing lists
@@ -245,7 +256,9 @@ class IndiePitcherClient:
         response.raise_for_status()
         return EmptyResponse.model_validate_json(response.content)
 
-    def send_email_to_mailing_list(self, email: SendEmailToMailingList) -> EmptyResponse:
+    def send_email_to_mailing_list(
+        self, email: SendEmailToMailingList
+    ) -> EmptyResponse:
         """
         Send an email to a mailing list.
 
@@ -259,7 +272,8 @@ class IndiePitcherClient:
             requests.HTTPError: If the request fails
         """
         response = self.session.post(
-            f"{self.base_url}/email/list", json=email.model_dump(by_alias=True, exclude_none=True)
+            f"{self.base_url}/email/list",
+            json=email.model_dump(by_alias=True, exclude_none=True),
         )
         response.raise_for_status()
         return EmptyResponse.model_validate_json(response.content)
