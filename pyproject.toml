@@ -30,6 +30,15 @@ dependencies = [
     "requests>=2.25.0",
 ]
 
+[dependency-groups]
+dev = [
+    "pytest>=7.4.2",
+    "pytest-cov>=4.1.0",
+    "mypy>=1.5.1",
+    "ruff>=0.0.292",
+    "pytest-asyncio>=0.26.0",
+]
+
 [project.urls]
 Homepage = "https://github.com/IndiePitcher/indiepitcher-python"
 Documentation = "https://docs.indiepitcher.com"
@@ -43,25 +52,3 @@ testpaths = ["tests"]
 python_files = "test_*.py"
 python_functions = "test_*"
 filterwarnings = ["ignore::DeprecationWarning"]
-
-# [tool.ruff]
-# target-version = "py39"
-# line-length = 100
-# select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RUF", "PL"]
-# ignore = []
-# fixable = ["ALL"]
-
-# [tool.ruff.isort]
-# known-first-party = ["indiepitcher"]
-
-# [tool.mypy]
-# python_version = "3.9"
-# disallow_untyped_defs = true
-# disallow_incomplete_defs = true
-# check_untyped_defs = true
-# disallow_untyped_decorators = true
-# no_implicit_optional = true
-# strict_optional = true
-# warn_redundant_casts = true
-# warn_return_any = true
-# warn_unused_ignores = true
