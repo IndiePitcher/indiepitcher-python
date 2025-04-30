@@ -3,10 +3,19 @@ from enum import Enum
 from typing import Any, Dict, Generic, List, Optional, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
-from pydantic.alias_generators import to_camel, to_snake
+from pydantic.alias_generators import to_camel
 
 T = TypeVar("T")
 M = TypeVar("M", bound=Dict[str, Any])
+
+
+def to_camel_patched(snake: str) -> str:
+    return to_camel(snake=snake).replace("Url", "URL")
+
+
+def to_camel_patched_for_response(snake: str) -> str:
+    print(f"xxx patching response: {snake}")
+    return to_camel(snake=snake).replace("URL", "Url")
 
 
 class EmailBodyFormat(str, Enum):
@@ -21,7 +30,7 @@ class BaseIndiePitcherResponseModel(BaseModel):
 
     model_config = ConfigDict(
         populate_by_name=True,
-        alias_generator=to_camel,
+        alias_generator=to_camel_patched_for_response,
         arbitrary_types_allowed=True,
     )
 
@@ -31,7 +40,7 @@ class BaseIndiePitcherRequestModel(BaseModel):
 
     model_config = ConfigDict(
         populate_by_name=True,
-        alias_generator=to_snake,
+        alias_generator=to_camel_patched,
         arbitrary_types_allowed=True,
     )
 
@@ -159,6 +168,15 @@ class SendEmailToMailingList(BaseIndiePitcherRequestModel):
     delay_until_date: Optional[datetime] = None
     track_email_opens: Optional[bool] = None
     track_email_link_clicks: Optional[bool] = None
+
+
+class IndiePitcherResponseError(Exception):
+    """Exception raised when an API request returns an error response."""
+
+    def __init__(self, status_code: int, reason: str):
+        self.status_code = status_code
+        self.reason = reason
+        super().__init__(f"{status_code}: {reason}")
 
 
 # Type aliases for common response types

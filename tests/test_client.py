@@ -6,14 +6,18 @@ import time
 import pytest
 from dotenv import load_dotenv
 
-from indiepitcher import IndiePitcherClient
+from indiepitcher import (
+    CreateMailingListPortalSession,
+    IndiePitcherClient,
+    IndiePitcherResponseError,
+)
 
 # Load environment variables from .env file
 load_dotenv()
 
 
 @pytest.fixture
-def client():
+def client() -> IndiePitcherClient:
     """Create a test client with API key from environment."""
     api_key = os.environ.get("INDIEPITCHER_API_KEY", "test_api_key")
     return IndiePitcherClient(api_key=api_key)
@@ -26,52 +30,28 @@ def sleep_after_test():
     time.sleep(1)  # Then sleeps for 1 second after the test completes
 
 
-def test_list_mailing_lists(client):
+def test_invalid_api_key():
+    """Test client initialization with an invalid API key."""
+
+    client = IndiePitcherClient(api_key="xxx")
+    with pytest.raises(IndiePitcherResponseError):
+        client.list_mailing_lists()
+
+
+def test_list_mailing_lists(client: IndiePitcherClient) -> None:
     """Test listing mailing lists."""
 
     response = client.list_mailing_lists()
     assert len(response.data) == 3
 
 
-# def test_get_contact(client):
-#     """Test getting a contact by email."""
+def test_create_mailing_list_management_session(client: IndiePitcherClient) -> None:
+    """Test creating a list management session"""
 
-#     response = client.get_contact("test@example.com")
+    response = client.create_mailing_list_portal_session(
+        CreateMailingListPortalSession(
+            contact_email="petr@indiepitcher.com", return_url="https://indiepitcher.com"
+        )
+    )
 
-#     assert response.success is True
-#     assert response.data.email == "test@example.com"
-#     assert response.data.name == "Test User"
-#     assert response.data.user_id == "123"
-#     assert response.data.subscribed_to_lists == ["list1"]
-
-
-# def test_create_contact(client):
-#     """Test creating a contact."""
-
-#     contact = CreateContact(
-#         email="new@example.com",
-#         name="New User",
-#         user_id="456",
-#         subscribed_to_lists=["list1"],
-#     )
-
-#     response = client.create_contact(contact)
-
-#     assert response.success is True
-#     assert response.data.email == "new@example.com"
-#     assert response.data.name == "New User"
-
-
-# def test_send_email(client):
-#     """Test sending an email."""
-
-#     email = SendEmail(
-#         to="recipient@example.com",
-#         subject="Test Email",
-#         body="Hello world",
-#         body_format=EmailBodyFormat.MARKDOWN,
-#     )
-
-#     response = client.send_email(email)
-
-#     assert response.success is True
+    # assert response.data.url == "https://indiepitcher.com"

@@ -9,6 +9,7 @@ from .models import (  # Models; Response types; Enums
     CreateMailingListPortalSession,
     EmailBodyFormat,
     EmptyResponse,
+    IndiePitcherResponseError,
     MailingList,
     MailingListPortalSession,
     MailingListPortalSessionResponse,
@@ -20,14 +21,11 @@ from .models import (  # Models; Response types; Enums
 )
 
 __all__ = [
-    # Models
     "Contact",
-    # Response types
     "ContactResponse",
     "ContactsResponse",
     "CreateContact",
     "CreateMailingListPortalSession",
-    # Enums
     "EmailBodyFormat",
     "EmptyResponse",
     "IndiePitcherClient",
@@ -39,4 +37,5 @@ __all__ = [
     "SendEmailToContact",
     "SendEmailToMailingList",
     "UpdateContact",
+    "IndiePitcherResponseError",
 ]
