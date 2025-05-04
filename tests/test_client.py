@@ -27,7 +27,9 @@ def client() -> IndiePitcherClient:
 def sleep_after_test():
     """Sleep for 1 second after each test."""
     yield  # This allows the test to run
-    time.sleep(1)  # Then sleeps for 1 second after the test completes
+    time.sleep(
+        1
+    )  # Then sleeps for 1 second after the test completes to work around rate limiting
 
 
 def test_invalid_api_key():

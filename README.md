@@ -1,6 +1,6 @@
 # IndiePitcher Python SDK
 
-Official Python SDK for [IndiePitcher](https://indiepitcher.com) - email marketing platform for indie hackers.
+Official Python SDK for [IndiePitcher](https://indiepitcher.com)
 
 ## Installation
 
@@ -96,18 +96,21 @@ response = client.send_email_to_mailing_list(email)
 
 ## Development
 
-### Setup
+### Setting Up the Development Environment
+
+For fast dependency installation, we recommend using UV:
 
 ```bash
-# Clone the repository
-git clone https://github.com/indiepitcher/indiepitcher-python.git
-cd indiepitcher-python
+# Install UV if you don't have it
+pip install uv
 
-# Install development dependencies with uv (recommended)
+# Create a virtual environment and install dependencies
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 uv pip install -e ".[dev]"
 
-# Or with pip
-pip install -e ".[dev]"
+# Run tests
+uv run pytest
 ```
 
 ### Testing
@@ -115,19 +118,6 @@ pip install -e ".[dev]"
 ```bash
 # Run tests
 pytest
-
-# Run tests with coverage
-pytest --cov=indiepitcher
-```
-
-### Linting
-
-```bash
-# Run linter
-ruff check .
-
-# Fix linting issues automatically
-ruff check --fix .
 ```
 
 ## License
