@@ -26,8 +26,8 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "pydantic>=2.0.0",
-    "requests>=2.25.0",
+    "httpx >=0.28.1",
+    "pydantic >=2.11.2"
 ]
 
 [dependency-groups]

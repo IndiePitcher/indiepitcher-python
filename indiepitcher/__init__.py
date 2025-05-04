@@ -1,5 +1,6 @@
 """IndiePitcher Python SDK for email marketing platform."""
 
+from .async_client import IndiePitcherAsyncClient
 from .client import IndiePitcherClient
 from .models import (  # Models; Response types; Enums
     Contact,
@@ -30,4 +31,5 @@ __all__ = [
     "SendEmailToMailingList",
     "UpdateContact",
     "IndiePitcherResponseError",
+    "IndiePitcherAsyncClient",
 ]

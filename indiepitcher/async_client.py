@@ -32,14 +32,14 @@ def raise_for_invalid_status(response: httpx.Response) -> None:
         )
 
 
-class IndiePitcherClient:
-    """Client for interacting with the IndiePitcher API."""
+class IndiePitcherAsyncClient:
+    """Async client for interacting with the IndiePitcher API."""
 
     def __init__(
         self, api_key: str, base_url: str = "https://api.indiepitcher.com/v1"
     ) -> None:
         """
-        Initialize the IndiePitcher API client.
+        Initialize the IndiePitcher async API client.
 
         Args:
             api_key: Your IndiePitcher API key
@@ -47,7 +47,7 @@ class IndiePitcherClient:
         """
         self.api_key = api_key
         self.base_url = base_url
-        self.client = httpx.Client(
+        self.client = httpx.AsyncClient(
             headers={
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
@@ -56,21 +56,21 @@ class IndiePitcherClient:
             timeout=30.0,  # Default timeout of 30 seconds
         )
 
-    def __enter__(self):
-        """Support context manager protocol."""
+    async def __aenter__(self):
+        """Support async context manager protocol."""
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Close the client when exiting context manager."""
-        self.close()
+        await self.close()
 
-    def close(self):
+    async def close(self):
         """Close the underlying HTTP client."""
-        self.client.close()
+        await self.client.aclose()
 
     # Contact Management
 
-    def get_contact(self, email: str) -> DataResponse[Contact]:
+    async def get_contact(self, email: str) -> DataResponse[Contact]:
         """
         Find a contact by email.
 
@@ -83,13 +83,13 @@ class IndiePitcherClient:
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
         """
-        response = self.client.get(
+        response = await self.client.get(
             f"{self.base_url}/contacts/find", params={"email": email}
         )
         raise_for_invalid_status(response)
         return DataResponse[Contact].model_validate_json(response.content)
 
-    def list_contacts(
+    async def list_contacts(
         self, page: int = 1, per_page: int = 20
     ) -> PagedDataResponse[Contact]:
         """
@@ -105,13 +105,13 @@ class IndiePitcherClient:
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
         """
-        response = self.client.get(
+        response = await self.client.get(
             f"{self.base_url}/contacts", params={"page": page, "per": per_page}
         )
         raise_for_invalid_status(response)
         return PagedDataResponse[Contact].model_validate_json(response.content)
 
-    def create_contact(self, contact: CreateContact) -> DataResponse[Contact]:
+    async def create_contact(self, contact: CreateContact) -> DataResponse[Contact]:
         """
         Add a new contact.
 
@@ -124,14 +124,16 @@ class IndiePitcherClient:
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
         """
-        response = self.client.post(
+        response = await self.client.post(
             f"{self.base_url}/contacts/create",
             json=contact.model_dump(by_alias=True, exclude_none=True),
         )
         raise_for_invalid_status(response)
         return DataResponse[Contact].model_validate_json(response.content)
 
-    def create_contacts(self, contacts: List[CreateContact]) -> DataResponse[Contact]:
+    async def create_contacts(
+        self, contacts: List[CreateContact]
+    ) -> DataResponse[Contact]:
         """
         Add multiple contacts in a single request.
 
@@ -145,7 +147,8 @@ class IndiePitcherClient:
             indiepitcher.IndiePitcherResponseError: If the request fails
             ValueError: If more than 100 contacts are provided
         """
-        response = self.client.post(
+
+        response = await self.client.post(
             f"{self.base_url}/contacts/create_many",
             json=[
                 contact.model_dump(by_alias=True, exclude_none=True)
@@ -155,7 +158,7 @@ class IndiePitcherClient:
         raise_for_invalid_status(response)
         return DataResponse[Contact].model_validate_json(response.content)
 
-    def update_contact(self, contact: UpdateContact) -> DataResponse[Contact]:
+    async def update_contact(self, contact: UpdateContact) -> DataResponse[Contact]:
         """
         Update an existing contact.
 
@@ -168,14 +171,14 @@ class IndiePitcherClient:
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
         """
-        response = self.client.patch(
+        response = await self.client.patch(
             f"{self.base_url}/contacts/update",
             json=contact.model_dump(by_alias=True, exclude_none=True),
         )
         raise_for_invalid_status(response)
         return DataResponse[Contact].model_validate_json(response.content)
 
-    def delete_contact(self, email: str) -> EmptyResponse:
+    async def delete_contact(self, email: str) -> EmptyResponse:
         """
         Delete a contact by email.
 
@@ -188,7 +191,7 @@ class IndiePitcherClient:
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
         """
-        response = self.client.post(
+        response = await self.client.post(
             f"{self.base_url}/contacts/delete", json={"email": email}
         )
         raise_for_invalid_status(response)
@@ -196,7 +199,7 @@ class IndiePitcherClient:
 
     # Mailing List Management
 
-    def list_mailing_lists(
+    async def list_mailing_lists(
         self, page: int = 1, per_page: int = 10
     ) -> PagedDataResponse[MailingList]:
         """
@@ -212,13 +215,13 @@ class IndiePitcherClient:
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
         """
-        response = self.client.get(
+        response = await self.client.get(
             f"{self.base_url}/lists", params={"page": page, "per": per_page}
         )
         raise_for_invalid_status(response)
         return PagedDataResponse[MailingList].model_validate_json(response.content)
 
-    def create_mailing_list_portal_session(
+    async def create_mailing_list_portal_session(
         self, session: CreateMailingListPortalSession
     ) -> DataResponse[MailingListPortalSession]:
         """
@@ -233,7 +236,8 @@ class IndiePitcherClient:
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
         """
-        response = self.client.post(
+
+        response = await self.client.post(
             f"{self.base_url}/lists/portal_session",
             json=session.model_dump(by_alias=True, exclude_none=True),
         )
@@ -244,7 +248,7 @@ class IndiePitcherClient:
 
     # Email Sending
 
-    def send_email(self, email: SendEmail) -> EmptyResponse:
+    async def send_email(self, email: SendEmail) -> EmptyResponse:
         """
         Send a transactional email.
 
@@ -257,14 +261,14 @@ class IndiePitcherClient:
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
         """
-        response = self.client.post(
+        response = await self.client.post(
             f"{self.base_url}/email/transactional",
             json=email.model_dump(by_alias=True, exclude_none=True),
         )
         raise_for_invalid_status(response)
         return EmptyResponse.model_validate_json(response.content)
 
-    def send_email_to_contact(self, email: SendEmailToContact) -> EmptyResponse:
+    async def send_email_to_contact(self, email: SendEmailToContact) -> EmptyResponse:
         """
         Send an email to one or more contacts.
 
@@ -277,14 +281,14 @@ class IndiePitcherClient:
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
         """
-        response = self.client.post(
+        response = await self.client.post(
             f"{self.base_url}/email/contact",
             json=email.model_dump(by_alias=True, exclude_none=True),
         )
         raise_for_invalid_status(response)
         return EmptyResponse.model_validate_json(response.content)
 
-    def send_email_to_mailing_list(
+    async def send_email_to_mailing_list(
         self, email: SendEmailToMailingList
     ) -> EmptyResponse:
         """
@@ -299,7 +303,7 @@ class IndiePitcherClient:
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
         """
-        response = self.client.post(
+        response = await self.client.post(
             f"{self.base_url}/email/list",
             json=email.model_dump(by_alias=True, exclude_none=True),
         )
