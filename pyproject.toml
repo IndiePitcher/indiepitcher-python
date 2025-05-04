@@ -48,6 +48,7 @@ Issues = "https://github.com/IndiePitcher/indiepitcher-python/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["indiepitcher"]
+include = ["indiepitcher/py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

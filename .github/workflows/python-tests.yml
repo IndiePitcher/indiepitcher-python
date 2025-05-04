@@ -33,6 +33,10 @@ jobs:
     - name: Lint with ruff
       run: |
         uv run ruff check .
+
+    - name: Type check
+      run: |
+        uv run mypy indiepitcher
         
     - name: Test with pytest
       env:
