@@ -54,4 +54,4 @@ def test_create_mailing_list_management_session(client: IndiePitcherClient) -> N
         )
     )
 
-    # assert response.data.url == "https://indiepitcher.com"
+    assert response.data.return_url == "https://indiepitcher.com"
