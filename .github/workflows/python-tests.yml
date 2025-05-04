@@ -28,14 +28,14 @@ jobs:
         
     - name: Install dependencies with UV
       run: |
-        uv pip install -e ".[dev]"
+        uv pip install -e ".[dev]" --system
         
     - name: Lint with ruff
       run: |
-        uv run ruff check .
+        ruff check .
         
     - name: Test with pytest
       env:
         INDIEPITCHER_API_KEY: ${{ secrets.INDIEPITCHER_API_KEY }}
       run: |
-        uv run pytest -v
+        pytest -v
