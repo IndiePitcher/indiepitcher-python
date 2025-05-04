@@ -3,7 +3,7 @@ from typing import List
 import requests
 
 from .models import (
-    BaseIndiePitcherResponseModel,
+    BaseIndiePitcherModel,
     ContactResponse,
     ContactsResponse,
     CreateContact,
@@ -19,7 +19,7 @@ from .models import (
 )
 
 
-class ErrorResponse(BaseIndiePitcherResponseModel):
+class ErrorResponse(BaseIndiePitcherModel):
     reason: str
 
 
