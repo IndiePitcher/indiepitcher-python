@@ -4,14 +4,15 @@ import requests
 
 from .models import (
     BaseIndiePitcherModel,
-    ContactResponse,
-    ContactsResponse,
+    Contact,
     CreateContact,
     CreateMailingListPortalSession,
+    DataResponse,
     EmptyResponse,
     IndiePitcherResponseError,
-    MailingListPortalSessionResponse,
-    MailingListsResponse,
+    MailingList,
+    MailingListPortalSession,
+    PagedDataResponse,
     SendEmail,
     SendEmailToContact,
     SendEmailToMailingList,
@@ -57,7 +58,7 @@ class IndiePitcherClient:
 
     # Contact Management
 
-    def get_contact(self, email: str) -> ContactResponse:
+    def get_contact(self, email: str) -> DataResponse[Contact]:
         """
         Find a contact by email.
 
@@ -65,7 +66,7 @@ class IndiePitcherClient:
             email: The email address of the contact to find
 
         Returns:
-            ContactResponse: The contact if found
+            DataResponse[Contact]: The contact if found
 
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
@@ -74,18 +75,20 @@ class IndiePitcherClient:
             f"{self.base_url}/contacts/find", params={"email": email}
         )
         raise_for_invalid_status(response)
-        return ContactResponse.model_validate_json(response.content)
+        return DataResponse[Contact].model_validate_json(response.content)
 
-    def list_contacts(self, page: int = 1, per_page: int = 50) -> ContactsResponse:
+    def list_contacts(
+        self, page: int = 1, per_page: int = 20
+    ) -> PagedDataResponse[Contact]:
         """
         List contacts with pagination.
 
         Args:
             page: Page number (default: 1)
-            per_page: Number of contacts per page (default: 50)
+            per_page: Number of contacts per page (default: 20)
 
         Returns:
-            ContactsResponse: Paginated list of contacts
+            PagedDataResponse[Contact]: Paginated list of contacts
 
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
@@ -94,9 +97,9 @@ class IndiePitcherClient:
             f"{self.base_url}/contacts", params={"page": page, "per": per_page}
         )
         raise_for_invalid_status(response)
-        return ContactsResponse.model_validate_json(response.content)
+        return PagedDataResponse[Contact].model_validate_json(response.content)
 
-    def create_contact(self, contact: CreateContact) -> ContactResponse:
+    def create_contact(self, contact: CreateContact) -> DataResponse[Contact]:
         """
         Add a new contact.
 
@@ -104,7 +107,7 @@ class IndiePitcherClient:
             contact: Contact details to create
 
         Returns:
-            ContactResponse: The created contact
+            DataResponse[Contact]: The created contact
 
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
@@ -114,9 +117,9 @@ class IndiePitcherClient:
             json=contact.model_dump(by_alias=True, exclude_none=True),
         )
         raise_for_invalid_status(response)
-        return ContactResponse.model_validate_json(response.content)
+        return DataResponse[Contact].model_validate_json(response.content)
 
-    def create_contacts(self, contacts: List[CreateContact]) -> ContactsResponse:
+    def create_contacts(self, contacts: List[CreateContact]) -> DataResponse[Contact]:
         """
         Add multiple contacts in a single request.
 
@@ -124,14 +127,12 @@ class IndiePitcherClient:
             contacts: List of contacts to create (max 100)
 
         Returns:
-            ContactsResponse: The created contacts
+            DataResponse[Contact]: The created contacts
 
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
             ValueError: If more than 100 contacts are provided
         """
-        if len(contacts) > 100:
-            raise ValueError("Maximum 100 contacts can be created in a single request")
 
         response = self.session.post(
             f"{self.base_url}/contacts/create_many",
@@ -141,9 +142,9 @@ class IndiePitcherClient:
             ],
         )
         raise_for_invalid_status(response)
-        return ContactsResponse.model_validate_json(response.content)
+        return DataResponse[Contact].model_validate_json(response.content)
 
-    def update_contact(self, contact: UpdateContact) -> ContactResponse:
+    def update_contact(self, contact: UpdateContact) -> DataResponse[Contact]:
         """
         Update an existing contact.
 
@@ -151,7 +152,7 @@ class IndiePitcherClient:
             contact: Contact details to update
 
         Returns:
-            ContactResponse: The updated contact
+            DataResponse[Contact]: The updated contact
 
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
@@ -161,7 +162,7 @@ class IndiePitcherClient:
             json=contact.model_dump(by_alias=True, exclude_none=True),
         )
         raise_for_invalid_status(response)
-        return ContactResponse.model_validate_json(response.content)
+        return DataResponse[Contact].model_validate_json(response.content)
 
     def delete_contact(self, email: str) -> EmptyResponse:
         """
@@ -186,7 +187,7 @@ class IndiePitcherClient:
 
     def list_mailing_lists(
         self, page: int = 1, per_page: int = 10
-    ) -> MailingListsResponse:
+    ) -> PagedDataResponse[MailingList]:
         """
         Get all mailing lists.
 
@@ -195,7 +196,7 @@ class IndiePitcherClient:
             per_page: Number of lists per page (default: 10)
 
         Returns:
-            MailingListsResponse: Paginated list of mailing lists
+            PagedDataResponse[MailingList]: Paginated list of mailing lists
 
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
@@ -204,11 +205,11 @@ class IndiePitcherClient:
             f"{self.base_url}/lists", params={"page": page, "per": per_page}
         )
         raise_for_invalid_status(response)
-        return MailingListsResponse.model_validate_json(response.content)
+        return PagedDataResponse[MailingList].model_validate_json(response.content)
 
     def create_mailing_list_portal_session(
         self, session: CreateMailingListPortalSession
-    ) -> MailingListPortalSessionResponse:
+    ) -> DataResponse[MailingListPortalSession]:
         """
         Create a mailing list portal session.
 
@@ -221,13 +222,15 @@ class IndiePitcherClient:
         Raises:
             indiepitcher.IndiePitcherResponseError: If the request fails
         """
+
         response = self.session.post(
             f"{self.base_url}/lists/portal_session",
             json=session.model_dump(by_alias=True, exclude_none=True),
         )
         raise_for_invalid_status(response)
-        print(f"xxx {response.content}")
-        return MailingListPortalSessionResponse.model_validate_json(response.content)
+        return DataResponse[MailingListPortalSession].model_validate_json(
+            response.content
+        )
 
     # Email Sending
 

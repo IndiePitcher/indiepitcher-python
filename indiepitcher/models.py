@@ -30,14 +30,20 @@ class BaseIndiePitcherModel(BaseModel):
     )
 
 
-class Response(BaseIndiePitcherModel, Generic[T]):
+class DataResponse(BaseIndiePitcherModel, Generic[T]):
     """Generic response wrapper for API responses with data."""
 
     success: bool
     data: T
 
 
-class PaginationMetadata(BaseIndiePitcherModel):
+class EmptyResponse(BaseIndiePitcherModel):
+    """Generic response wrapper for API responses with no data."""
+
+    success: bool
+
+
+class PageMetadata(BaseIndiePitcherModel):
     """Standard pagination metadata."""
 
     page: int
@@ -45,12 +51,12 @@ class PaginationMetadata(BaseIndiePitcherModel):
     total: int
 
 
-class PaginatedResponse(BaseIndiePitcherModel, Generic[T]):
+class PagedDataResponse(BaseIndiePitcherModel, Generic[T]):
     """Generic response wrapper for paginated API responses."""
 
     success: bool
     data: List[T]
-    metadata: PaginationMetadata
+    metadata: PageMetadata
 
 
 class Contact(BaseIndiePitcherModel):
@@ -162,11 +168,3 @@ class IndiePitcherResponseError(Exception):
         self.status_code = status_code
         self.reason = reason
         super().__init__(f"{status_code}: {reason}")
-
-
-# Type aliases for common response types
-ContactResponse = Response[Contact]
-EmptyResponse = Response[None]
-ContactsResponse = PaginatedResponse[Contact]
-MailingListsResponse = PaginatedResponse[MailingList]
-MailingListPortalSessionResponse = Response[MailingListPortalSession]

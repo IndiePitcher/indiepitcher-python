@@ -3,8 +3,6 @@
 from .client import IndiePitcherClient
 from .models import (  # Models; Response types; Enums
     Contact,
-    ContactResponse,
-    ContactsResponse,
     CreateContact,
     CreateMailingListPortalSession,
     EmailBodyFormat,
@@ -12,8 +10,6 @@ from .models import (  # Models; Response types; Enums
     IndiePitcherResponseError,
     MailingList,
     MailingListPortalSession,
-    MailingListPortalSessionResponse,
-    MailingListsResponse,
     SendEmail,
     SendEmailToContact,
     SendEmailToMailingList,
@@ -22,8 +18,6 @@ from .models import (  # Models; Response types; Enums
 
 __all__ = [
     "Contact",
-    "ContactResponse",
-    "ContactsResponse",
     "CreateContact",
     "CreateMailingListPortalSession",
     "EmailBodyFormat",
@@ -31,8 +25,6 @@ __all__ = [
     "IndiePitcherClient",
     "MailingList",
     "MailingListPortalSession",
-    "MailingListPortalSessionResponse",
-    "MailingListsResponse",
     "SendEmail",
     "SendEmailToContact",
     "SendEmailToMailingList",
