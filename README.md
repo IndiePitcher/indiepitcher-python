@@ -20,6 +20,9 @@ from indiepitcher import IndiePitcherClient, SendEmail, EmailBodyFormat
 # Initialize the client with your API key
 client = IndiePitcherClient(api_key="your_api_key")
 
+# or for async environments
+# client = IndiePitcherAsyncClient(api_key="your_api_key")
+
 # Send a transactional email
 email = SendEmail(
     to="recipient@example.com",
@@ -34,11 +37,11 @@ print(f"Email sent successfully: {response.success}")
 
 ## Features
 
+- Sync and async variants for all requests
 - Send transactional emails with Markdown or HTML content
 - Create and manage contacts
 - Send emails to contacts or mailing lists
 - Create portal sessions for users to manage their subscriptions
-- Full Pydantic model support for type safety
 
 ## Documentation
 
@@ -93,6 +96,34 @@ email = SendEmailToMailingList(
 
 response = client.send_email_to_mailing_list(email)
 ```
+
+## Async Support
+
+The SDK also provides an asynchronous client for use in async applications:
+
+```python
+import asyncio
+from indiepitcher import IndiePitcherAsyncClient, SendEmail, EmailBodyFormat
+
+async def send_email_example():
+    async with IndiePitcherAsyncClient(api_key="your_api_key") as client:
+        # Send a transactional email
+        email = SendEmail(
+            to="recipient@example.com",
+            subject="Hello from IndiePitcher!",
+            body="This is a **markdown** email sent via the IndiePitcher Python SDK.",
+            body_format=EmailBodyFormat.MARKDOWN
+        )
+        
+        response = await client.send_email(email)
+        return response.success
+
+# Run in an async context
+success = asyncio.run(send_email_example())
+print(f"Email sent successfully: {success}")
+```
+
+The async client supports all the same methods as the synchronous client, but requires the `await` keyword and should be used within an async context.
 
 ## Development
 
